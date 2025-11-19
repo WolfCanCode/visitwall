@@ -12,6 +12,7 @@ import AvatarEditor from "./AvatarEditor";
 import { MOCK_USER } from "@/lib/data";
 
 import PixelCheckbox from "./PixelCheckbox";
+import { Options } from "@dicebear/pixel-art";
 
 const STATUS_OPTIONS = [
   { value: "online", label: "Online" },
@@ -30,8 +31,8 @@ const SOCIAL_PLATFORMS = [
 export default function EditForm() {
   const [formData, setFormData] = useState<UserProfile>(MOCK_USER);
   const handleAvatarChange = useCallback(
-    (seed: string) => {
-      setFormData((prev) => ({ ...prev, avatarSeed: seed }));
+    (avatar: Options) => {
+      setFormData((prev) => ({ ...prev, avatar }));
     },
     [setFormData]
   );
@@ -169,7 +170,7 @@ export default function EditForm() {
           />
           <div className="md:col-span-2">
             <AvatarEditor
-              currentSeed={formData.avatarSeed}
+              avatar={formData.avatar as Options}
               onAvatarChange={handleAvatarChange}
             />
           </div>

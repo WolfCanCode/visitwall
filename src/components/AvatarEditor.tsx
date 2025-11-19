@@ -138,24 +138,27 @@ const SKIN_COLOR_VARIANTS = [
 ];
 
 interface AvatarEditorProps {
-  currentSeed: string;
-  onAvatarChange: (options: Options & { seed: string }) => void;
+  avatar: Options;
+  onAvatarChange: (avatar: Options) => void;
 }
 
-export default function AvatarEditor({ onAvatarChange }: AvatarEditorProps) {
-  const [options, setOptions] = useState<Options & { seed: string }>({
-    ...{ seed: "wolf" },
-  });
+export default function AvatarEditor({
+  avatar,
+  onAvatarChange,
+}: AvatarEditorProps) {
+  const [options, setOptions] = useState<Options>(
+    avatar ? { ...avatar } : ({ seed: "wolf" } as Options)
+  );
 
   // Generate avatar SVG
-  const avatar = useMemo(() => {
+  const avatarRendered = useMemo(() => {
     return createAvatar(pixelArt, {
       size: 128,
       ...options,
     });
   }, [options]);
 
-  const svgContent = useMemo(() => avatar.toString(), [avatar]);
+  const svgContent = useMemo(() => avatarRendered.toString(), [avatarRendered]);
 
   // Notify parent when the seed changes so it can persist the new avatar
 
@@ -165,7 +168,7 @@ export default function AvatarEditor({ onAvatarChange }: AvatarEditorProps) {
 
   const randomize = () => {
     const randomSeed = Math.random().toString(36).substring(7);
-    setOptions({ ...options, seed: randomSeed });
+    setOptions({ ...options, seed: randomSeed } as Options);
   };
 
   const randomizeTrait = (trait: keyof Options, variants: string[]) => {

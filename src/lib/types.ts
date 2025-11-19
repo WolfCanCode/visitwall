@@ -1,4 +1,4 @@
-import { Options } from "@dicebear/core";
+import { Options } from "@dicebear/pixel-art";
 
 export interface SocialLink {
   platform: "whatsapp" | "email" | "call";
