@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@theme {
+  --font-pixel: "Press Start 2P", system-ui;
+  --font-body: "Inter", system-ui;
+}
+
+@layer base {
+  :root {
+    --bg-color: #F3E9C8;
+    --card-bg: #FBF5D9;
+    --section-bg: #F7EAC5;
+    --button-bg: #E0DFC5;
+    --text-color: #000000;
+    --border-color: #000000;
+    --accent-color: #22C55E;
+    --dot-color: #D4CBA8;
+  }
+
+
+
+  .theme-gameboy {
+    --bg-color: #8B956D;
+    --card-bg: #9DA978;
+    --section-bg: #8B956D;
+    --button-bg: #4B5320;
+    --text-color: #0F380F;
+    --border-color: #0F380F;
+    --accent-color: #306230;
+    --dot-color: #78825B;
+  }
+
+  body {
+    @apply text-[var(--text-color)] font-body antialiased transition-colors duration-300;
+    background-color: var(--bg-color);
+    background-image: radial-gradient(var(--dot-color) 15%, transparent 16%), radial-gradient(var(--dot-color) 15%, transparent 16%);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+  }
+}

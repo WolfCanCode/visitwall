@@ -1,0 +1,30 @@
+import type { Metadata } from "next";
+import "./globals.css";
+import "@/styles/pixel.css";
+
+export const metadata: Metadata = {
+  title: "VisitWall",
+  description: "Status-first digital visiting card",
+};
+
+import RetroBackground from "@/components/RetroBackground";
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <head>
+        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+      </head>
+      <body>
+        <RetroBackground>
+          {children}
+        </RetroBackground>
+      </body>
+    </html>
+  );
+}
