@@ -1,11 +1,12 @@
 import { UserProfile } from "./types";
+import { Options } from "@dicebear/pixel-art";
 
 export const MOCK_USER: UserProfile = {
   username: "wolfcancode",
   displayName: "Tommy Le (Wolf)",
   role: "Frontend Architect",
   location: "Vlaardingen, The Netherlands",
-  avatar: { seed: "wolf" },
+  avatar: { seed: "wolf" } as Options,
   status: "vacation",
   socials: [
     { platform: "whatsapp", url: "#" },
