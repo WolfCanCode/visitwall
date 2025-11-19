@@ -1,7 +1,8 @@
+import { Options } from "@dicebear/core";
+
 export interface SocialLink {
-  platform: 'whatsapp' | 'email' | 'call';
+  platform: "whatsapp" | "email" | "call";
   url: string;
-  label: string;
 }
 
 export interface Goal {
@@ -21,8 +22,8 @@ export interface UserProfile {
   displayName: string;
   role: string;
   location: string;
-  avatarUrl: string;
-  status: 'online' | 'busy' | 'dnd' | 'offline';
+  avatar: Options;
+  status: "online" | "busy" | "dnd" | "offline" | "vacation";
   socials: SocialLink[];
   goals: Goal[];
   latestUpdate: Update;

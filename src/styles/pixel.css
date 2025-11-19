@@ -24,7 +24,7 @@
 }
 
 .pixel-heading {
-  @apply uppercase mb-4 text-[var(--text-color)];
+  @apply uppercase text-[var(--text-color)];
   font-family: "Press Start 2P", cursive;
   font-size: 12px;
   line-height: 1.5;

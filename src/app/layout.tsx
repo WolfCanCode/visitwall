@@ -7,30 +7,34 @@ import { MOCK_USER } from "@/lib/data";
 export const metadata: Metadata = {
   title: `${MOCK_USER.displayName} | VisitWall`,
   description: `${MOCK_USER.displayName}'s digital visiting card`,
-  icons: {
-    icon: MOCK_USER.avatarUrl,
-  },
   openGraph: {
     title: `${MOCK_USER.displayName} | VisitWall`,
     description: `${MOCK_USER.displayName}'s digital visiting card`,
+    type: "website",
+    siteName: "VisitWall",
     images: [
       {
-        url: MOCK_USER.avatarUrl,
+        url: generateAvatarUrl(MOCK_USER.avatar),
         width: 1200,
         height: 630,
         alt: `${MOCK_USER.displayName}'s avatar`,
       },
     ],
   },
+  appleWebApp: {
+    title: "VisitWall",
+    statusBarStyle: "black-translucent",
+  },
   twitter: {
     card: "summary_large_image",
     title: `${MOCK_USER.displayName} | VisitWall`,
     description: `${MOCK_USER.displayName}'s digital visiting card`,
-    images: [MOCK_USER.avatarUrl],
+    images: [generateAvatarUrl(MOCK_USER.avatar)],
   },
 };
 
 import RetroBackground from "@/components/RetroBackground";
+import { generateAvatarUrl } from "@/lib/utils";
 
 export default function RootLayout({
   children,
@@ -40,13 +44,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+          rel="stylesheet"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body>
-        <RetroBackground>
-          {children}
-        </RetroBackground>
+        <RetroBackground>{children}</RetroBackground>
       </body>
     </html>
   );
