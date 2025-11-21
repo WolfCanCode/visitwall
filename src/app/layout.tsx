@@ -35,6 +35,7 @@ export const metadata: Metadata = {
 
 import RetroBackground from "@/components/RetroBackground";
 import { generateAvatarUrl } from "@/lib/utils";
+import DevIndicator from "@/components/DevIndicator";
 
 export default function RootLayout({
   children,
@@ -54,6 +55,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <DevIndicator />
         <RetroBackground>{children}</RetroBackground>
       </body>
     </html>
