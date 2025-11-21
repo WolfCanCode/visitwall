@@ -15,6 +15,7 @@ import { Options } from "@dicebear/pixel-art";
 import PixelModal from "./PixelModal";
 import VisitWallCard from "./VisitWallCard";
 import PixelTabs from "./PixelTabs";
+import { getSocialLink, getSocialDisplayValue } from "@/lib/utils";
 
 const STATUS_OPTIONS = [
   { value: "online", label: "Online" },
@@ -28,6 +29,12 @@ const SOCIAL_PLATFORMS = [
   { value: "whatsapp", label: "WhatsApp" },
   { value: "email", label: "Email" },
   { value: "call", label: "Call" },
+  { value: "locket", label: "Locket" },
+  { value: "messenger", label: "Messenger" },
+  { value: "instagram", label: "Instagram" },
+  { value: "x", label: "X (Twitter)" },
+  { value: "facebook", label: "Facebook" },
+  { value: "snapchat", label: "Snapchat" },
 ];
 
 interface EditFormProps {
@@ -138,13 +145,10 @@ export default function EditForm({ initialData }: EditFormProps) {
 
     // Process social links to add prefixes if needed
     const processedSocials = formData.socials.map((social) => {
-      let url = social.url;
-      if (social.platform === "email" && !url.startsWith("mailto:")) {
-        url = `mailto:${url}`;
-      } else if (social.platform === "call" && !url.startsWith("tel:")) {
-        url = `tel:${url}`;
-      }
-      return { ...social, url };
+      return {
+        ...social,
+        url: getSocialLink(social.platform, social.url),
+      };
     });
 
     const dataToSave: UserProfile = {
@@ -308,7 +312,7 @@ export default function EditForm({ initialData }: EditFormProps) {
                   />
                   <PixelInput
                     label="Value"
-                    value={social.url.replace(/^(mailto:|tel:)/, "")}
+                    value={getSocialDisplayValue(social.platform, social.url)}
                     onChange={(e) =>
                       handleSocialChange(index, "url", e.target.value)
                     }
@@ -427,7 +431,16 @@ export default function EditForm({ initialData }: EditFormProps) {
         title="Card Preview"
       >
         <div className="flex justify-center p-4">
-          <VisitWallCard user={formData} showThemeSwitcher={false} />
+          <VisitWallCard
+            user={{
+              ...formData,
+              socials: formData.socials.map((s) => ({
+                ...s,
+                url: getSocialLink(s.platform, s.url),
+              })),
+            }}
+            showThemeSwitcher={false}
+          />
         </div>
       </PixelModal>
     </PixelCard>

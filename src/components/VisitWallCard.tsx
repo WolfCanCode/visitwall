@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import { UserProfile } from "@/lib/types";
 import PixelCard from "./PixelCard";
 import PixelButton from "./PixelButton";
@@ -110,9 +109,9 @@ export default function VisitWallCard({
 
         {/* Contact Buttons Grid */}
         <div className="grid grid-cols-2 gap-3 mb-6">
-          {user.socials.map((social) => (
+          {user.socials.map((social, index) => (
             <a
-              key={social.platform}
+              key={`${social.platform}-${index}`}
               href={social.url}
               target="_blank"
               rel="noopener noreferrer"
