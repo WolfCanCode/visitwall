@@ -1,8 +1,8 @@
 <svg width="64" height="64" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
   <!-- Outer square frame -->
-  <rect x="3" y="3" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.5" />
+  <rect x="3" y="3" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" />
   <!-- Top bar (camera body) -->
-  <rect x="5" y="4" width="6" height="2" fill="currentColor" stroke="none" />
-  <!-- Heart shape -->
-  <path d="M6.5 8.5 L7 8 L7.5 8.5 L8 9 L8.5 8.5 L9 8 L9.5 8.5 L10 9 L9.5 9.5 L8.5 10 L8 10.5 L7.5 10 L6.5 9.5 Z" fill="currentColor" stroke="none" />
+  <rect x="5" y="4" width="6" height="2" fill="none" stroke="currentColor" stroke-width="2" />
+  <!-- Heart outline -->
+  <path d="M6.5 8.5 L7 8 L7.5 8.5 L8 9 L8.5 8.5 L9 8 L9.5 8.5 L10 9 L9.5 9.5 L8.5 10 L8 10.5 L7.5 10 L6.5 9.5 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="miter" />
 </svg>

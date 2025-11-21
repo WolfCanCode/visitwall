@@ -119,11 +119,14 @@ export default function VisitWallCard({
               className="contents"
             >
               <PixelButton className="w-full flex items-center justify-center gap-3 text-[10px] uppercase px-2">
-                <PixelSocialIcon platform={social.platform} size={20} />
+                {/* <PixelSocialIcon platform={social.platform} size={20} /> */}
                 <span className="flex-1 text-left">{social.platform}</span>
               </PixelButton>
             </a>
           ))}
+        </div>
+
+        <div className="mb-6">
           <SaveContactButton user={user} className="text-[10px]" />
         </div>
 
