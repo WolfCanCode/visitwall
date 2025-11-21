@@ -8,8 +8,8 @@ export default function DevIndicator() {
   if (!isDev) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 bg-yellow-400 text-black px-3 py-2 font-pixel text-[10px] border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] pointer-events-none uppercase tracking-wider">
-      🚧 DEV ENV
+    <div className="fixed bottom-25 right-4 z-50 bg-yellow-400 text-black px-3 py-2 font-pixel text-[6px] border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] pointer-events-none uppercase tracking-wider">
+      DEV
     </div>
   );
 }
