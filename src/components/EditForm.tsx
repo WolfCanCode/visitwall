@@ -178,6 +178,36 @@ export default function EditForm({ initialData }: EditFormProps) {
       label: "PROFILE",
       content: (
         <div className="space-y-6">
+          {/* Profile Link */}
+          <div>
+            <PixelHeading as="h3" className="mb-3 text-sm">
+              YOUR PROFILE LINK
+            </PixelHeading>
+            <PixelSection className="flex items-center gap-2 bg-white!">
+              <div className="flex-1 font-pixel text-[10px] truncate text-blue-600">
+                <a
+                  href={`https://dev.visitwall.com/${formData.username}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {`https://dev.visitwall.com/${formData.username}`}
+                </a>
+              </div>
+              <PixelButton
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    `https://dev.visitwall.com/${formData.username}`
+                  );
+                  alert("Copied to clipboard!");
+                }}
+                className="text-[10px] py-1 px-2 h-auto min-h-0"
+              >
+                COPY
+              </PixelButton>
+            </PixelSection>
+          </div>
+
           {/* Basic Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <PixelInput
