@@ -311,8 +311,28 @@ export default function EditForm({ initialData }: EditFormProps) {
                     className="mb-0"
                   />
                   <PixelInput
-                    label="Value"
+                    label={
+                      social.platform === "whatsapp" ||
+                      social.platform === "call"
+                        ? "Phone Number"
+                        : social.platform === "email"
+                        ? "Email Address"
+                        : social.platform === "locket"
+                        ? "Link"
+                        : "Username"
+                    }
                     value={getSocialDisplayValue(social.platform, social.url)}
+                    placeholder={
+                      social.platform === "whatsapp"
+                        ? "Phone with country code"
+                        : social.platform === "email"
+                        ? "name@example.com"
+                        : social.platform === "locket"
+                        ? "Share link"
+                        : social.platform === "call"
+                        ? "Phone number"
+                        : "Username"
+                    }
                     onChange={(e) =>
                       handleSocialChange(index, "url", e.target.value)
                     }

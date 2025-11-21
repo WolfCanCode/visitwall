@@ -7,6 +7,7 @@ import PixelHeading from "./PixelHeading";
 import ThemeSwitcher from "./ThemeSwitcher";
 import PixelSticker from "./PixelSticker";
 import TypewriterText from "./TypewriterText";
+import { PixelSocialIcon } from "./PixelSocialIcon";
 import {
   PixelZap,
   PixelClock,
@@ -117,8 +118,9 @@ export default function VisitWallCard({
               rel="noopener noreferrer"
               className="contents"
             >
-              <PixelButton className="w-full flex items-center justify-center text-[10px] uppercase">
-                {social.platform}
+              <PixelButton className="w-full flex items-center justify-center gap-3 text-[10px] uppercase px-2">
+                <PixelSocialIcon platform={social.platform} size={20} />
+                <span className="flex-1 text-left">{social.platform}</span>
               </PixelButton>
             </a>
           ))}
