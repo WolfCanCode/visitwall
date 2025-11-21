@@ -285,12 +285,14 @@ export default function AvatarEditor({
           </div>
           <div className="grid grid-cols-2 gap-2 col-span-2">
             <PixelButton
+              type="button"
               onClick={() => randomizeTrait("hair", HAIR_VARIANTS)}
               className="text-[10px] py-1"
             >
               Hair Style
             </PixelButton>
             <PixelButton
+              type="button"
               onClick={() => randomizeColor("hairColor")}
               className="text-[10px] py-1"
             >
@@ -303,42 +305,49 @@ export default function AvatarEditor({
           </div>
           <div className="grid grid-cols-2 gap-2 col-span-2">
             <PixelButton
+              type="button"
               onClick={() => randomizeTrait("eyes", EYES_VARIANTS)}
               className="text-[10px] py-1"
             >
               Eyes Style
             </PixelButton>
             <PixelButton
+              type="button"
               onClick={() => randomizeColor("eyesColor")}
               className="text-[10px] py-1"
             >
               Eyes Color
             </PixelButton>
             <PixelButton
+              type="button"
               onClick={() => randomizeTrait("mouth", MOUTH_VARIANTS)}
               className="text-[10px] py-1"
             >
               Mouth Style
             </PixelButton>
             <PixelButton
+              type="button"
               onClick={() => randomizeColor("mouthColor")}
               className="text-[10px] py-1"
             >
               Mouth Color
             </PixelButton>
             <PixelButton
+              type="button"
               onClick={() => randomizeTrait("clothing", CLOTHING_VARIANTS)}
               className="text-[10px] py-1"
             >
               Outfit Style
             </PixelButton>
             <PixelButton
+              type="button"
               onClick={() => randomizeColor("clothingColor")}
               className="text-[10px] py-1"
             >
               Outfit Color
             </PixelButton>
             <PixelButton
+              type="button"
               onClick={() => randomizeTrait("skinColor", SKIN_COLOR_VARIANTS)}
               className="text-[10px] py-1 col-span-2"
             >
@@ -365,12 +374,14 @@ export default function AvatarEditor({
             {options.glassesProbability === 100 && (
               <div className="grid grid-cols-2 gap-2 ml-6">
                 <PixelButton
+                  type="button"
                   onClick={() => randomizeTrait("glasses", GLASSES_VARIANTS)}
                   className="text-[10px] py-1"
                 >
                   Style
                 </PixelButton>
                 <PixelButton
+                  type="button"
                   onClick={() => randomizeColor("glassesColor")}
                   className="text-[10px] py-1"
                 >
@@ -395,6 +406,7 @@ export default function AvatarEditor({
             {options.beardProbability === 100 && (
               <div className="grid grid-cols-2 gap-2 ml-6">
                 <PixelButton
+                  type="button"
                   onClick={() => randomizeTrait("beard", BEARD_VARIANTS)}
                   className="text-[10px] py-1"
                 >
@@ -419,12 +431,14 @@ export default function AvatarEditor({
             {options.hatProbability === 100 && (
               <div className="grid grid-cols-2 gap-2 ml-6">
                 <PixelButton
+                  type="button"
                   onClick={() => randomizeTrait("hat", HAT_VARIANTS)}
                   className="text-[10px] py-1"
                 >
                   Style
                 </PixelButton>
                 <PixelButton
+                  type="button"
                   onClick={() => randomizeColor("hatColor")}
                   className="text-[10px] py-1"
                 >
