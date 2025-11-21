@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import PixelCard from "@/components/PixelCard";
@@ -10,7 +10,7 @@ import PixelHeading from "@/components/PixelHeading";
 import PixelSection from "@/components/PixelSection";
 import { verifyEmail } from "@/lib/api";
 
-export default function ConfirmPage() {
+function ConfirmForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
@@ -78,77 +78,81 @@ export default function ConfirmPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-4 py-12">
-      <PixelCard className="w-full max-w-md">
-        <PixelHeading as="h1" className="text-center mb-6">
-          VERIFY EMAIL
-        </PixelHeading>
+    <PixelCard className="w-full max-w-md">
+      <PixelHeading as="h1" className="text-center mb-6">
+        VERIFY EMAIL
+      </PixelHeading>
 
-        <form onSubmit={handleVerify} className="space-y-6">
-          {error && (
-            <PixelSection className="p-3 bg-red-500/20 border-red-500">
-              <p className="font-pixel text-xs text-red-500">{error}</p>
-            </PixelSection>
-          )}
-
-          {success && (
-            <PixelSection className="p-3 bg-green-500/20 border-green-500">
-              <p className="font-pixel text-xs text-green-500">{success}</p>
-            </PixelSection>
-          )}
-
-          <PixelSection className="p-3 bg-blue-500/20 border-blue-500">
-            <p className="font-pixel text-xs text-blue-500 mb-2">
-              Check your email ({email}) for the verification code.
-            </p>
-            <p className="font-pixel text-[10px] text-gray-400">
-              If using a fake email or cannot access, you must verify manually
-              in AWS.
-            </p>
+      <form onSubmit={handleVerify} className="space-y-6">
+        {error && (
+          <PixelSection className="p-3 bg-red-500/20 border-red-500">
+            <p className="font-pixel text-xs text-red-500">{error}</p>
           </PixelSection>
+        )}
 
-          <PixelInput
-            label="Verification Code"
-            name="verificationCode"
-            type="text"
-            value={verificationCode}
-            onChange={(e) => setVerificationCode(e.target.value)}
-            required
-            placeholder="Enter code from email"
-          />
+        {success && (
+          <PixelSection className="p-3 bg-green-500/20 border-green-500">
+            <p className="font-pixel text-xs text-green-500">{success}</p>
+          </PixelSection>
+        )}
 
-          <div className="pt-4 space-y-3">
-            <PixelButton
-              type="submit"
-              className="w-full"
-              disabled={isVerifying}
-            >
-              {isVerifying ? "VERIFYING..." : "VERIFY EMAIL"}
-            </PixelButton>
+        <PixelSection className="p-3 bg-blue-500/20 border-blue-500">
+          <p className="font-pixel text-xs text-blue-500 mb-2">
+            Check your email ({email}) for the verification code.
+          </p>
+          <p className="font-pixel text-[10px] text-gray-400">
+            If using a fake email or cannot access, you must verify manually in
+            AWS.
+          </p>
+        </PixelSection>
 
-            <PixelButton
-              type="button"
-              onClick={handleSkipVerification}
-              className="w-full"
-              variant="secondary"
-            >
-              SKIP (VERIFY LATER)
-            </PixelButton>
-          </div>
+        <PixelInput
+          label="Verification Code"
+          name="verificationCode"
+          type="text"
+          value={verificationCode}
+          onChange={(e) => setVerificationCode(e.target.value)}
+          required
+          placeholder="Enter code from email"
+        />
 
-          <div className="text-center">
-            <p className="font-pixel text-[10px] text-gray-400 mb-2">
-              Already verified?
-            </p>
-            <Link
-              href="/login"
-              className="font-pixel text-xs text-blue-500 hover:underline"
-            >
-              LOGIN HERE
-            </Link>
-          </div>
-        </form>
-      </PixelCard>
+        <div className="pt-4 space-y-3">
+          <PixelButton type="submit" className="w-full" disabled={isVerifying}>
+            {isVerifying ? "VERIFYING..." : "VERIFY EMAIL"}
+          </PixelButton>
+
+          <PixelButton
+            type="button"
+            onClick={handleSkipVerification}
+            className="w-full"
+            variant="secondary"
+          >
+            SKIP (VERIFY LATER)
+          </PixelButton>
+        </div>
+
+        <div className="text-center">
+          <p className="font-pixel text-[10px] text-gray-400 mb-2">
+            Already verified?
+          </p>
+          <Link
+            href="/login"
+            className="font-pixel text-xs text-blue-500 hover:underline"
+          >
+            LOGIN HERE
+          </Link>
+        </div>
+      </form>
+    </PixelCard>
+  );
+}
+
+export default function ConfirmPage() {
+  return (
+    <main className="min-h-screen flex items-center justify-center p-4 py-12">
+      <Suspense fallback={<div className="font-pixel text-sm">LOADING...</div>}>
+        <ConfirmForm />
+      </Suspense>
     </main>
   );
 }
