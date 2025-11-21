@@ -23,7 +23,7 @@ export default function PixelToast({
   }, [duration, onClose]);
 
   return (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 animate-in fade-in slide-in-from-top-4 duration-300">
+    <div className="fixed bottom-26 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
       <PixelSection
         className={`p-4 border-2 shadow-lg flex items-center justify-between gap-4 ${
           type === "success"

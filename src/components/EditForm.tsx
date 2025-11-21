@@ -425,7 +425,7 @@ export default function EditForm({ initialData, onLogout }: EditFormProps) {
   ];
 
   return (
-    <div className="w-full max-w-2xl mx-auto pt-16">
+    <div className="w-full max-w-2xl mx-auto py-16">
       <div className="fixed top-0 left-0 w-full z-40">
         <PixelCard className="rounded-none border-x-0 border-t-0 flex shadow-md py-4 px-4 bg-[var(--card-bg)]">
           <div className="max-w-7xl flex justify-between items-center w-full mx-auto">

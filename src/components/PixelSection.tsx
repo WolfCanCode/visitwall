@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface PixelSectionProps {
   children: React.ReactNode;
@@ -6,7 +6,11 @@ interface PixelSectionProps {
   style?: React.CSSProperties;
 }
 
-export default function PixelSection({ children, className = '', style }: PixelSectionProps) {
+export default function PixelSection({
+  children,
+  className = "",
+  style,
+}: PixelSectionProps) {
   return (
     <div className={`pixel-section ${className}`} style={style}>
       {children}
