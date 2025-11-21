@@ -30,6 +30,12 @@
     --dot-color: #78825B;
   }
 
+  html, body {
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior-y: none;
+  }
+
   body {
     @apply text-[var(--text-color)] font-body antialiased transition-colors duration-300;
     background-color: var(--bg-color);
