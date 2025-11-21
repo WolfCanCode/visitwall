@@ -9,10 +9,12 @@ import PixelHeading from "./PixelHeading";
 import PixelSelect from "./PixelSelect";
 import PixelSection from "./PixelSection";
 import AvatarEditor from "./AvatarEditor";
-import { MOCK_USER } from "@/lib/data";
-
+import { updateProfile } from "@/lib/api";
 import PixelCheckbox from "./PixelCheckbox";
 import { Options } from "@dicebear/pixel-art";
+import PixelModal from "./PixelModal";
+import VisitWallCard from "./VisitWallCard";
+import PixelTabs from "./PixelTabs";
 
 const STATUS_OPTIONS = [
   { value: "online", label: "Online" },
@@ -28,8 +30,28 @@ const SOCIAL_PLATFORMS = [
   { value: "call", label: "Call" },
 ];
 
-export default function EditForm() {
-  const [formData, setFormData] = useState<UserProfile>(MOCK_USER);
+interface EditFormProps {
+  initialData: UserProfile;
+}
+
+export default function EditForm({ initialData }: EditFormProps) {
+  const [formData, setFormData] = useState<UserProfile>(() => {
+    const data = { ...initialData };
+    if (!data.socials || data.socials.length === 0) {
+      data.socials = [{ platform: "whatsapp", url: "" }];
+    }
+    if (!data.goals || data.goals.length === 0) {
+      data.goals = [{ id: Date.now().toString(), text: "", completed: false }];
+    }
+    return data;
+  });
+  const [isSaving, setIsSaving] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+
   const handleAvatarChange = useCallback(
     (avatar: Options) => {
       setFormData((prev) => ({ ...prev, avatar }));
@@ -95,8 +117,24 @@ export default function EditForm() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const addSocial = () => {
+    setFormData((prev) => ({
+      ...prev,
+      socials: [...prev.socials, { platform: "whatsapp", url: "" }],
+    }));
+  };
+
+  const removeSocial = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      socials: prev.socials.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSaving(true);
+    setMessage(null);
 
     // Process social links to add prefixes if needed
     const processedSocials = formData.socials.map((social) => {
@@ -109,8 +147,7 @@ export default function EditForm() {
       return { ...social, url };
     });
 
-    // Update the date to now when saving
-    const dataToSave = {
+    const dataToSave: UserProfile = {
       ...formData,
       socials: processedSocials,
       latestUpdate: {
@@ -123,86 +160,113 @@ export default function EditForm() {
       },
     };
 
-    console.log("Saved data:", dataToSave);
-    // TODO: Implement actual save logic
-    alert("Profile updated! (Mock save)");
+    try {
+      const updatedProfile = await updateProfile(dataToSave);
+      setFormData(updatedProfile);
+      setMessage({ type: "success", text: "Profile updated successfully!" });
+    } catch (error) {
+      console.error(error);
+      setMessage({ type: "error", text: "Failed to update profile." });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  return (
-    <PixelCard className="w-full max-w-2xl mx-auto">
-      <PixelHeading as="h2" className="text-center mb-6">
-        EDIT PROFILE
-      </PixelHeading>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Basic Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <PixelInput
-            label="Display Name"
-            name="displayName"
-            value={formData.displayName}
-            onChange={handleChange}
-          />
-          <PixelInput
-            label="Username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-          />
-          <PixelInput
-            label="Role"
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-          />
-          <PixelInput
-            label="Location"
-            name="location"
-            value={formData.location}
-            onChange={handleChange}
-          />
-          <PixelSelect
-            label="Status"
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            options={STATUS_OPTIONS}
-          />
-          <div className="md:col-span-2">
-            <AvatarEditor
-              avatar={formData.avatar as Options}
-              onAvatarChange={handleAvatarChange}
+  const tabs = [
+    {
+      id: "profile",
+      label: "PROFILE",
+      content: (
+        <div className="space-y-6">
+          {/* Basic Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <PixelInput
+              label="Display Name"
+              name="displayName"
+              value={formData.displayName}
+              onChange={handleChange}
+            />
+            <PixelInput
+              label="Username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              disabled
+            />
+            <PixelInput
+              label="Role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+            />
+            <PixelInput
+              label="Location"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+            />
+            <PixelSelect
+              label="Status"
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              options={STATUS_OPTIONS}
             />
           </div>
-        </div>
 
-        {/* Latest Update */}
-        <div>
-          <PixelHeading as="h3" className="mb-3 text-sm">
-            LATEST UPDATE
-          </PixelHeading>
-          <PixelSection>
-            <div className="grid grid-cols-1 gap-4">
-              <PixelInput
-                label="Update Text"
-                name="text"
-                value={formData.latestUpdate.text}
-                onChange={handleUpdateChange}
-                className="mb-0"
-              />
-            </div>
-          </PixelSection>
+          {/* Latest Update */}
+          <div>
+            <PixelHeading as="h3" className="mb-3 text-sm">
+              LATEST UPDATE
+            </PixelHeading>
+            <PixelSection>
+              <div className="grid grid-cols-1 gap-4">
+                <PixelInput
+                  label="Update Text"
+                  name="text"
+                  value={formData.latestUpdate.text}
+                  onChange={handleUpdateChange}
+                  className="mb-0"
+                />
+              </div>
+            </PixelSection>
+          </div>
         </div>
-
-        {/* Socials */}
+      ),
+    },
+    {
+      id: "avatar",
+      label: "AVATAR",
+      content: (
+        <div className="flex flex-col items-center">
+          <AvatarEditor
+            avatar={formData.avatar as Options}
+            onAvatarChange={handleAvatarChange}
+          />
+        </div>
+      ),
+    },
+    {
+      id: "socials",
+      label: "SOCIALS",
+      content: (
         <div>
-          <PixelHeading as="h3" className="mb-3 text-sm">
-            SOCIAL LINKS
-          </PixelHeading>
+          <div className="flex justify-between items-center mb-3">
+            <PixelHeading as="h3" className="mb-0 text-sm">
+              SOCIAL LINKS
+            </PixelHeading>
+            <PixelButton
+              type="button"
+              onClick={addSocial}
+              className="text-[10px] py-1 px-2"
+            >
+              + ADD SOCIAL
+            </PixelButton>
+          </div>
           <div className="space-y-4">
             {formData.socials.map((social, index) => (
               <PixelSection key={index} className="relative">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pr-8">
                   <PixelSelect
                     label="Platform"
                     value={social.platform}
@@ -221,12 +285,23 @@ export default function EditForm() {
                     className="mb-0"
                   />
                 </div>
+                <PixelButton
+                  type="button"
+                  onClick={() => removeSocial(index)}
+                  className="absolute top-2 right-2 text-red-500 px-2! py-1! border-red-500! min-w-0"
+                >
+                  ✕
+                </PixelButton>
               </PixelSection>
             ))}
           </div>
         </div>
-
-        {/* Goals */}
+      ),
+    },
+    {
+      id: "goals",
+      label: "GOALS",
+      content: (
         <div>
           <div className="flex justify-between items-center mb-3">
             <PixelHeading as="h3" className="mb-0 text-sm">
@@ -272,16 +347,59 @@ export default function EditForm() {
             ))}
           </div>
         </div>
+      ),
+    },
+  ];
 
-        <div className="pt-4 flex justify-center">
+  return (
+    <PixelCard className="w-full max-w-2xl mx-auto">
+      <PixelHeading as="h2" className="text-center mb-6">
+        EDIT PROFILE
+      </PixelHeading>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {message && (
+          <PixelSection
+            className={`p-3 border ${
+              message.type === "success"
+                ? "bg-green-500/20 border-green-500 text-green-500"
+                : "bg-red-500/20 border-red-500 text-red-500"
+            }`}
+          >
+            <p className="font-pixel text-xs">{message.text}</p>
+          </PixelSection>
+        )}
+
+        <PixelTabs tabs={tabs} />
+
+        <div className="pt-4 flex justify-center gap-3 border-t-2 border-gray-100 mt-6">
+          <PixelButton
+            type="button"
+            onClick={() => setShowPreview(true)}
+            variant="secondary"
+            className="w-full md:w-auto md:min-w-[150px]"
+          >
+            PREVIEW CARD
+          </PixelButton>
           <PixelButton
             type="submit"
             className="w-full md:w-auto md:min-w-[200px]"
+            disabled={isSaving}
           >
-            SAVE CHANGES
+            {isSaving ? "SAVING..." : "SAVE CHANGES"}
           </PixelButton>
         </div>
       </form>
+
+      <PixelModal
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        title="Card Preview"
+      >
+        <div className="flex justify-center p-4">
+          <VisitWallCard user={formData} showThemeSwitcher={false} />
+        </div>
+      </PixelModal>
     </PixelCard>
   );
 }

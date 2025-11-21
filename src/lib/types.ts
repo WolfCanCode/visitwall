@@ -27,4 +27,7 @@ export interface UserProfile {
   socials: SocialLink[];
   goals: Goal[];
   latestUpdate: Update;
+  PK?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }

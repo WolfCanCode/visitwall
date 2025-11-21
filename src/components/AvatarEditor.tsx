@@ -125,6 +125,47 @@ const HAIR_VARIANTS = [
   "long01",
 ];
 
+const GLASSES_VARIANTS = [
+  "light01",
+  "light02",
+  "light03",
+  "light04",
+  "light05",
+  "light06",
+  "light07",
+  "dark01",
+  "dark02",
+  "dark03",
+  "dark04",
+  "dark05",
+  "dark06",
+  "dark07",
+];
+
+const BEARD_VARIANTS = [
+  "variant01",
+  "variant02",
+  "variant03",
+  "variant04",
+  "variant05",
+  "variant06",
+  "variant07",
+  "variant08",
+];
+
+const HAT_VARIANTS = [
+  "variant01",
+  "variant02",
+  "variant03",
+  "variant04",
+  "variant05",
+  "variant06",
+  "variant07",
+  "variant08",
+  "variant09",
+  "variant10",
+];
+
 const SKIN_COLOR_VARIANTS = [
   "ffc994",
   "ffceb4",
@@ -135,6 +176,29 @@ const SKIN_COLOR_VARIANTS = [
   "d08b5b",
   "ae5d29",
   "614335",
+];
+
+const PIXEL_COLORS = [
+  "e74c3c",
+  "e67e22",
+  "f1c40f",
+  "2ecc71",
+  "3498db",
+  "9b59b6",
+  "34495e",
+  "ecf0f1",
+  "95a5a6",
+  "7f8c8d",
+  "000000",
+  "ffffff",
+  "8e44ad",
+  "2c3e50",
+  "1abc9c",
+  "16a085",
+  "27ae60",
+  "2980b9",
+  "d35400",
+  "c0392b",
 ];
 
 interface AvatarEditorProps {
@@ -161,7 +225,6 @@ export default function AvatarEditor({
   const svgContent = useMemo(() => avatarRendered.toString(), [avatarRendered]);
 
   // Notify parent when the seed changes so it can persist the new avatar
-
   useEffect(() => {
     onAvatarChange(options);
   }, [options, onAvatarChange]);
@@ -176,6 +239,15 @@ export default function AvatarEditor({
     setOptions((prev) => ({
       ...prev,
       [trait]: [randomVariant],
+    }));
+  };
+
+  const randomizeColor = (trait: keyof Options) => {
+    const randomColor =
+      PIXEL_COLORS[Math.floor(Math.random() * PIXEL_COLORS.length)];
+    setOptions((prev) => ({
+      ...prev,
+      [trait]: [randomColor],
     }));
   };
 
@@ -209,80 +281,157 @@ export default function AvatarEditor({
 
         <div className="grid grid-cols-2 gap-3">
           <div className="col-span-2 font-pixel text-[10px] uppercase opacity-75 mt-2">
-            Traits
+            Hair & Head
+          </div>
+          <div className="grid grid-cols-2 gap-2 col-span-2">
+            <PixelButton
+              onClick={() => randomizeTrait("hair", HAIR_VARIANTS)}
+              className="text-[10px] py-1"
+            >
+              Hair Style
+            </PixelButton>
+            <PixelButton
+              onClick={() => randomizeColor("hairColor")}
+              className="text-[10px] py-1"
+            >
+              Hair Color
+            </PixelButton>
           </div>
 
-          <PixelButton
-            type="button"
-            onClick={() => randomizeTrait("hair", HAIR_VARIANTS)}
-            className="text-xs py-2"
-          >
-            Change Hair
-          </PixelButton>
-          <PixelButton
-            type="button"
-            onClick={() => randomizeTrait("clothing", CLOTHING_VARIANTS)}
-            className="text-xs py-2"
-          >
-            Change Outfit
-          </PixelButton>
-          <PixelButton
-            type="button"
-            onClick={() => randomizeTrait("eyes", EYES_VARIANTS)}
-            className="text-xs py-2"
-          >
-            Change Eyes
-          </PixelButton>
-          <PixelButton
-            type="button"
-            onClick={() => randomizeTrait("mouth", MOUTH_VARIANTS)}
-            className="text-xs py-2"
-          >
-            Change Mouth
-          </PixelButton>
-          <PixelButton
-            type="button"
-            onClick={() => randomizeTrait("skinColor", SKIN_COLOR_VARIANTS)}
-            className="text-xs py-2 col-span-2"
-          >
-            Change Skin Color
-          </PixelButton>
+          <div className="col-span-2 font-pixel text-[10px] uppercase opacity-75 mt-2">
+            Face & Body
+          </div>
+          <div className="grid grid-cols-2 gap-2 col-span-2">
+            <PixelButton
+              onClick={() => randomizeTrait("eyes", EYES_VARIANTS)}
+              className="text-[10px] py-1"
+            >
+              Eyes Style
+            </PixelButton>
+            <PixelButton
+              onClick={() => randomizeColor("eyesColor")}
+              className="text-[10px] py-1"
+            >
+              Eyes Color
+            </PixelButton>
+            <PixelButton
+              onClick={() => randomizeTrait("mouth", MOUTH_VARIANTS)}
+              className="text-[10px] py-1"
+            >
+              Mouth Style
+            </PixelButton>
+            <PixelButton
+              onClick={() => randomizeColor("mouthColor")}
+              className="text-[10px] py-1"
+            >
+              Mouth Color
+            </PixelButton>
+            <PixelButton
+              onClick={() => randomizeTrait("clothing", CLOTHING_VARIANTS)}
+              className="text-[10px] py-1"
+            >
+              Outfit Style
+            </PixelButton>
+            <PixelButton
+              onClick={() => randomizeColor("clothingColor")}
+              className="text-[10px] py-1"
+            >
+              Outfit Color
+            </PixelButton>
+            <PixelButton
+              onClick={() => randomizeTrait("skinColor", SKIN_COLOR_VARIANTS)}
+              className="text-[10px] py-1 col-span-2"
+            >
+              Skin Tone
+            </PixelButton>
+          </div>
 
           <div className="col-span-2 font-pixel text-[10px] uppercase opacity-75 mt-2">
             Accessories
           </div>
 
-          <div
-            className="flex items-center gap-2 cursor-pointer"
-            onClick={() => toggleProbability("glassesProbability")}
-          >
-            <PixelCheckbox
-              checked={options.glassesProbability === 100}
-              onChange={() => {}} // handled by parent div
-            />
-            <span className="font-pixel text-xs">Glasses</span>
+          {/* Glasses */}
+          <div className="col-span-2 border-2 border-(--border-color) p-2 bg-[#d4d3b8]/20">
+            <div
+              className="flex items-center gap-2 mb-2 cursor-pointer"
+              onClick={() => toggleProbability("glassesProbability")}
+            >
+              <PixelCheckbox
+                checked={options.glassesProbability === 100}
+                onChange={() => {}}
+              />
+              <span className="font-pixel text-xs">Glasses</span>
+            </div>
+            {options.glassesProbability === 100 && (
+              <div className="grid grid-cols-2 gap-2 ml-6">
+                <PixelButton
+                  onClick={() => randomizeTrait("glasses", GLASSES_VARIANTS)}
+                  className="text-[10px] py-1"
+                >
+                  Style
+                </PixelButton>
+                <PixelButton
+                  onClick={() => randomizeColor("glassesColor")}
+                  className="text-[10px] py-1"
+                >
+                  Color
+                </PixelButton>
+              </div>
+            )}
           </div>
 
-          <div
-            className="flex items-center gap-2 cursor-pointer"
-            onClick={() => toggleProbability("beardProbability")}
-          >
-            <PixelCheckbox
-              checked={options.beardProbability === 100}
-              onChange={() => {}}
-            />
-            <span className="font-pixel text-xs">Beard</span>
+          {/* Beard */}
+          <div className="col-span-2 border-2 border-(--border-color) p-2 bg-[#d4d3b8]/20">
+            <div
+              className="flex items-center gap-2 mb-2 cursor-pointer"
+              onClick={() => toggleProbability("beardProbability")}
+            >
+              <PixelCheckbox
+                checked={options.beardProbability === 100}
+                onChange={() => {}}
+              />
+              <span className="font-pixel text-xs">Beard</span>
+            </div>
+            {options.beardProbability === 100 && (
+              <div className="grid grid-cols-2 gap-2 ml-6">
+                <PixelButton
+                  onClick={() => randomizeTrait("beard", BEARD_VARIANTS)}
+                  className="text-[10px] py-1"
+                >
+                  Style
+                </PixelButton>
+              </div>
+            )}
           </div>
 
-          <div
-            className="flex items-center gap-2 cursor-pointer"
-            onClick={() => toggleProbability("hatProbability")}
-          >
-            <PixelCheckbox
-              checked={options.hatProbability === 100}
-              onChange={() => {}}
-            />
-            <span className="font-pixel text-xs">Hat</span>
+          {/* Hat */}
+          <div className="col-span-2 border-2 border-(--border-color) p-2 bg-[#d4d3b8]/20">
+            <div
+              className="flex items-center gap-2 mb-2 cursor-pointer"
+              onClick={() => toggleProbability("hatProbability")}
+            >
+              <PixelCheckbox
+                checked={options.hatProbability === 100}
+                onChange={() => {}}
+              />
+              <span className="font-pixel text-xs">Hat</span>
+            </div>
+            {options.hatProbability === 100 && (
+              <div className="grid grid-cols-2 gap-2 ml-6">
+                <PixelButton
+                  onClick={() => randomizeTrait("hat", HAT_VARIANTS)}
+                  className="text-[10px] py-1"
+                >
+                  Style
+                </PixelButton>
+                <PixelButton
+                  onClick={() => randomizeColor("hatColor")}
+                  className="text-[10px] py-1"
+                >
+                  Color
+                </PixelButton>
+              </div>
+            )}
           </div>
         </div>
       </PixelSection>
