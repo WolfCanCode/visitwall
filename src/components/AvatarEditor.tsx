@@ -8,6 +8,7 @@ import PixelSection from "./PixelSection";
 import PixelButton from "./PixelButton";
 import PixelCheckbox from "./PixelCheckbox";
 import { PixelDice } from "./PixelIcons";
+import PixelModal from "./PixelModal";
 
 // Constant definitions for available variants based on schema
 const CLOTHING_VARIANTS = [
@@ -206,6 +207,47 @@ interface AvatarEditorProps {
   onAvatarChange: (avatar: Options) => void;
 }
 
+interface AvatarOptionPreviewProps {
+  trait: keyof Options;
+  option: string;
+  baseOptions: Options;
+  onClick: () => void;
+  selected: boolean;
+}
+
+function AvatarOptionPreview({
+  trait,
+  option,
+  baseOptions,
+  onClick,
+  selected,
+}: AvatarOptionPreviewProps) {
+  const svgContent = useMemo(() => {
+    return createAvatar(pixelArt, {
+      size: 64,
+      ...baseOptions,
+      [trait]: [option],
+    }).toString();
+  }, [trait, option, baseOptions]);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`p-1 border-2 transition-all ${
+        selected
+          ? "border-blue-500 bg-blue-50"
+          : "border-transparent hover:border-gray-300"
+      }`}
+    >
+      <div
+        className="w-16 h-16 overflow-hidden"
+        dangerouslySetInnerHTML={{ __html: svgContent }}
+      />
+    </button>
+  );
+}
+
 export default function AvatarEditor({
   avatar,
   onAvatarChange,
@@ -213,6 +255,13 @@ export default function AvatarEditor({
   const [options, setOptions] = useState<Options>(
     avatar ? { ...avatar } : ({ seed: "wolf" } as Options)
   );
+
+  const [activeSelector, setActiveSelector] = useState<{
+    type: "trait" | "color";
+    trait: keyof Options;
+    options: string[];
+    title: string;
+  } | null>(null);
 
   // Generate avatar SVG
   const avatarRendered = useMemo(() => {
@@ -234,21 +283,23 @@ export default function AvatarEditor({
     setOptions({ ...options, seed: randomSeed } as Options);
   };
 
-  const randomizeTrait = (trait: keyof Options, variants: string[]) => {
-    const randomVariant = variants[Math.floor(Math.random() * variants.length)];
-    setOptions((prev) => ({
-      ...prev,
-      [trait]: [randomVariant],
-    }));
+  const openSelector = (
+    trait: keyof Options,
+    variants: string[],
+    type: "trait" | "color",
+    title: string
+  ) => {
+    setActiveSelector({ type, trait, options: variants, title });
   };
 
-  const randomizeColor = (trait: keyof Options) => {
-    const randomColor =
-      PIXEL_COLORS[Math.floor(Math.random() * PIXEL_COLORS.length)];
+  const handleSelect = (value: string) => {
+    if (!activeSelector) return;
+
     setOptions((prev) => ({
       ...prev,
-      [trait]: [randomColor],
+      [activeSelector.trait]: [value],
     }));
+    setActiveSelector(null);
   };
 
   const toggleProbability = (trait: keyof Options) => {
@@ -286,14 +337,28 @@ export default function AvatarEditor({
           <div className="grid grid-cols-2 gap-2 col-span-2">
             <PixelButton
               type="button"
-              onClick={() => randomizeTrait("hair", HAIR_VARIANTS)}
+              onClick={() =>
+                openSelector(
+                  "hair",
+                  HAIR_VARIANTS,
+                  "trait",
+                  "Select Hair Style"
+                )
+              }
               className="text-[10px] py-1"
             >
               Hair Style
             </PixelButton>
             <PixelButton
               type="button"
-              onClick={() => randomizeColor("hairColor")}
+              onClick={() =>
+                openSelector(
+                  "hairColor",
+                  PIXEL_COLORS,
+                  "color",
+                  "Select Hair Color"
+                )
+              }
               className="text-[10px] py-1"
             >
               Hair Color
@@ -306,49 +371,88 @@ export default function AvatarEditor({
           <div className="grid grid-cols-2 gap-2 col-span-2">
             <PixelButton
               type="button"
-              onClick={() => randomizeTrait("eyes", EYES_VARIANTS)}
+              onClick={() =>
+                openSelector("eyes", EYES_VARIANTS, "trait", "Select Eyes")
+              }
               className="text-[10px] py-1"
             >
               Eyes Style
             </PixelButton>
             <PixelButton
               type="button"
-              onClick={() => randomizeColor("eyesColor")}
+              onClick={() =>
+                openSelector(
+                  "eyesColor",
+                  PIXEL_COLORS,
+                  "color",
+                  "Select Eyes Color"
+                )
+              }
               className="text-[10px] py-1"
             >
               Eyes Color
             </PixelButton>
             <PixelButton
               type="button"
-              onClick={() => randomizeTrait("mouth", MOUTH_VARIANTS)}
+              onClick={() =>
+                openSelector("mouth", MOUTH_VARIANTS, "trait", "Select Mouth")
+              }
               className="text-[10px] py-1"
             >
               Mouth Style
             </PixelButton>
             <PixelButton
               type="button"
-              onClick={() => randomizeColor("mouthColor")}
+              onClick={() =>
+                openSelector(
+                  "mouthColor",
+                  PIXEL_COLORS,
+                  "color",
+                  "Select Mouth Color"
+                )
+              }
               className="text-[10px] py-1"
             >
               Mouth Color
             </PixelButton>
             <PixelButton
               type="button"
-              onClick={() => randomizeTrait("clothing", CLOTHING_VARIANTS)}
+              onClick={() =>
+                openSelector(
+                  "clothing",
+                  CLOTHING_VARIANTS,
+                  "trait",
+                  "Select Outfit"
+                )
+              }
               className="text-[10px] py-1"
             >
               Outfit Style
             </PixelButton>
             <PixelButton
               type="button"
-              onClick={() => randomizeColor("clothingColor")}
+              onClick={() =>
+                openSelector(
+                  "clothingColor",
+                  PIXEL_COLORS,
+                  "color",
+                  "Select Outfit Color"
+                )
+              }
               className="text-[10px] py-1"
             >
               Outfit Color
             </PixelButton>
             <PixelButton
               type="button"
-              onClick={() => randomizeTrait("skinColor", SKIN_COLOR_VARIANTS)}
+              onClick={() =>
+                openSelector(
+                  "skinColor",
+                  SKIN_COLOR_VARIANTS,
+                  "color",
+                  "Select Skin Tone"
+                )
+              }
               className="text-[10px] py-1 col-span-2"
             >
               Skin Tone
@@ -375,14 +479,28 @@ export default function AvatarEditor({
               <div className="grid grid-cols-2 gap-2 ml-6">
                 <PixelButton
                   type="button"
-                  onClick={() => randomizeTrait("glasses", GLASSES_VARIANTS)}
+                  onClick={() =>
+                    openSelector(
+                      "glasses",
+                      GLASSES_VARIANTS,
+                      "trait",
+                      "Select Glasses"
+                    )
+                  }
                   className="text-[10px] py-1"
                 >
                   Style
                 </PixelButton>
                 <PixelButton
                   type="button"
-                  onClick={() => randomizeColor("glassesColor")}
+                  onClick={() =>
+                    openSelector(
+                      "glassesColor",
+                      PIXEL_COLORS,
+                      "color",
+                      "Select Glasses Color"
+                    )
+                  }
                   className="text-[10px] py-1"
                 >
                   Color
@@ -407,7 +525,14 @@ export default function AvatarEditor({
               <div className="grid grid-cols-2 gap-2 ml-6">
                 <PixelButton
                   type="button"
-                  onClick={() => randomizeTrait("beard", BEARD_VARIANTS)}
+                  onClick={() =>
+                    openSelector(
+                      "beard",
+                      BEARD_VARIANTS,
+                      "trait",
+                      "Select Beard"
+                    )
+                  }
                   className="text-[10px] py-1"
                 >
                   Style
@@ -432,14 +557,23 @@ export default function AvatarEditor({
               <div className="grid grid-cols-2 gap-2 ml-6">
                 <PixelButton
                   type="button"
-                  onClick={() => randomizeTrait("hat", HAT_VARIANTS)}
+                  onClick={() =>
+                    openSelector("hat", HAT_VARIANTS, "trait", "Select Hat")
+                  }
                   className="text-[10px] py-1"
                 >
                   Style
                 </PixelButton>
                 <PixelButton
                   type="button"
-                  onClick={() => randomizeColor("hatColor")}
+                  onClick={() =>
+                    openSelector(
+                      "hatColor",
+                      PIXEL_COLORS,
+                      "color",
+                      "Select Hat Color"
+                    )
+                  }
                   className="text-[10px] py-1"
                 >
                   Color
@@ -449,6 +583,50 @@ export default function AvatarEditor({
           </div>
         </div>
       </PixelSection>
+
+      <PixelModal
+        isOpen={!!activeSelector}
+        onClose={() => setActiveSelector(null)}
+        title={activeSelector?.title}
+      >
+        <div
+          className={`grid gap-3 p-2 ${
+            activeSelector?.type === "color"
+              ? "grid-cols-5 sm:grid-cols-6"
+              : "grid-cols-3 sm:grid-cols-4"
+          }`}
+        >
+          {activeSelector?.type === "color" &&
+            activeSelector.options.map((color) => (
+              <button
+                key={color}
+                type="button"
+                onClick={() => handleSelect(color)}
+                className={`aspect-square w-full rounded-sm border-2 shadow-sm transition-transform hover:scale-110 ${
+                  (options[activeSelector.trait] as string[])?.[0] === color
+                    ? "border-black scale-110 ring-2 ring-offset-2 ring-blue-400"
+                    : "border-transparent"
+                }`}
+                style={{ backgroundColor: `#${color}` }}
+                title={`#${color}`}
+              />
+            ))}
+
+          {activeSelector?.type === "trait" &&
+            activeSelector.options.map((variant) => (
+              <AvatarOptionPreview
+                key={variant}
+                trait={activeSelector.trait}
+                option={variant}
+                baseOptions={options}
+                selected={
+                  (options[activeSelector.trait] as string[])?.[0] === variant
+                }
+                onClick={() => handleSelect(variant)}
+              />
+            ))}
+        </div>
+      </PixelModal>
     </div>
   );
 }

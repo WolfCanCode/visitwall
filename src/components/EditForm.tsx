@@ -143,26 +143,43 @@ export default function EditForm({ initialData }: EditFormProps) {
     setIsSaving(true);
     setMessage(null);
 
-    // Process social links to add prefixes if needed
-    const processedSocials = formData.socials.map((social) => {
-      return {
-        ...social,
-        url: getSocialLink(social.platform, social.url),
-      };
-    });
+    // Filter out empty social links and process them
+    const processedSocials = formData.socials
+      .filter((social) => social.url && social.url.trim() !== "")
+      .map((social) => {
+        return {
+          ...social,
+          url: getSocialLink(social.platform, social.url),
+        };
+      });
 
-    const dataToSave: UserProfile = {
+    // Filter out empty goals
+    const processedGoals = formData.goals.filter(
+      (goal) => goal.text && goal.text.trim() !== ""
+    );
+
+    const dataToSave: Partial<UserProfile> = {
       ...formData,
       socials: processedSocials,
-      latestUpdate: {
+      goals: processedGoals,
+    };
+
+    // Only include latestUpdate if it has text
+    if (
+      formData.latestUpdate.text &&
+      formData.latestUpdate.text.trim() !== ""
+    ) {
+      dataToSave.latestUpdate = {
         ...formData.latestUpdate,
         date: new Date().toLocaleDateString("en-US", {
           month: "short",
           day: "numeric",
           year: "numeric",
         }),
-      },
-    };
+      };
+    } else {
+      delete dataToSave.latestUpdate;
+    }
 
     try {
       const updatedProfile = await updateProfile(dataToSave);
