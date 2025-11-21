@@ -8,6 +8,7 @@ import PixelInput from "@/components/PixelInput";
 import PixelButton from "@/components/PixelButton";
 import PixelHeading from "@/components/PixelHeading";
 import PixelSection from "@/components/PixelSection";
+import PixelToast from "@/components/PixelToast";
 import { verifyEmail } from "@/lib/api";
 
 function ConfirmForm() {
@@ -84,18 +85,6 @@ function ConfirmForm() {
       </PixelHeading>
 
       <form onSubmit={handleVerify} className="space-y-6">
-        {error && (
-          <PixelSection className="p-3 bg-red-500/20 border-red-500">
-            <p className="font-pixel text-xs text-red-500">{error}</p>
-          </PixelSection>
-        )}
-
-        {success && (
-          <PixelSection className="p-3 bg-green-500/20 border-green-500">
-            <p className="font-pixel text-xs text-green-500">{success}</p>
-          </PixelSection>
-        )}
-
         <PixelSection className="p-3 bg-blue-500/20 border-blue-500">
           <p className="font-pixel text-xs text-blue-500 mb-2">
             Check your email ({email}) for the verification code.
@@ -149,7 +138,7 @@ function ConfirmForm() {
 
 export default function ConfirmPage() {
   return (
-    <main className="min-h-screen flex items-center justify-center p-4 py-12">
+    <main className="min-h-screen flex items-center p-4 py-12">
       <Suspense fallback={<div className="font-pixel text-sm">LOADING...</div>}>
         <ConfirmForm />
       </Suspense>

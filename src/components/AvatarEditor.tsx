@@ -310,7 +310,7 @@ export default function AvatarEditor({
   };
 
   return (
-    <div className="mb-6">
+    <div className="mb-6 w-full">
       <label className="block font-pixel text-xs mb-2 uppercase">
         Avatar Editor
       </label>

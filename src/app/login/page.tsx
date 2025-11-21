@@ -8,6 +8,7 @@ import PixelInput from "@/components/PixelInput";
 import PixelButton from "@/components/PixelButton";
 import PixelHeading from "@/components/PixelHeading";
 import PixelSection from "@/components/PixelSection";
+import PixelToast from "@/components/PixelToast";
 import { login, setAuthToken, getAuthToken } from "@/lib/api";
 
 export default function LoginPage() {
@@ -86,12 +87,6 @@ export default function LoginPage() {
         </PixelHeading>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <PixelSection className="p-3 bg-red-500/20 border-red-500">
-              <p className="font-pixel text-xs text-red-500">{error}</p>
-            </PixelSection>
-          )}
-
           <PixelInput
             label="Email"
             name="email"
@@ -130,6 +125,13 @@ export default function LoginPage() {
             </Link>
           </div>
         </form>
+        {error && (
+          <PixelToast
+            message={error}
+            type="error"
+            onClose={() => setError("")}
+          />
+        )}
       </PixelCard>
     </main>
   );

@@ -16,6 +16,7 @@ import PixelModal from "./PixelModal";
 import VisitWallCard from "./VisitWallCard";
 import PixelTabs from "./PixelTabs";
 import { getSocialLink, getSocialDisplayValue } from "@/lib/utils";
+import PixelToast from "./PixelToast";
 
 const STATUS_OPTIONS = [
   { value: "online", label: "Online" },
@@ -39,9 +40,10 @@ const SOCIAL_PLATFORMS = [
 
 interface EditFormProps {
   initialData: UserProfile;
+  onLogout: () => void;
 }
 
-export default function EditForm({ initialData }: EditFormProps) {
+export default function EditForm({ initialData, onLogout }: EditFormProps) {
   const [formData, setFormData] = useState<UserProfile>(() => {
     const data = { ...initialData };
     if (!data.socials || data.socials.length === 0) {
@@ -423,63 +425,78 @@ export default function EditForm({ initialData }: EditFormProps) {
   ];
 
   return (
-    <PixelCard className="w-full max-w-2xl mx-auto">
-      <PixelHeading as="h2" className="text-center mb-6">
-        EDIT PROFILE
-      </PixelHeading>
+    <div className="w-full max-w-2xl mx-auto pt-16">
+      <div className="fixed top-0 left-0 w-full z-40">
+        <PixelCard className="rounded-none border-x-0 border-t-0 flex shadow-md py-4 px-4 bg-[var(--card-bg)]">
+          <div className="max-w-7xl flex justify-between items-center w-full mx-auto">
+            <PixelHeading as="h2" className="mb-0 text-sm md:text-base">
+              EDIT PROFILE
+            </PixelHeading>
+            <PixelButton
+              onClick={onLogout}
+              className="text-[10px] px-3 py-2"
+              variant="secondary"
+            >
+              LOGOUT
+            </PixelButton>
+          </div>
+        </PixelCard>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <PixelCard className="w-full">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <PixelTabs tabs={tabs} />
+
+          <div className="fixed bottom-0 left-0 w-full z-40">
+            <PixelCard className="rounded-none border-x-0 border-b-0 flex shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] pb-8 pt-4 px-4 bg-[var(--section-bg)]">
+              <div className="max-w-7xl flex justify-between w-full mx-auto gap-3">
+                <PixelButton
+                  type="button"
+                  onClick={() => setShowPreview(true)}
+                  variant="secondary"
+                  className="flex-1 md:flex-none md:w-auto md:min-w-[150px]"
+                >
+                  PREVIEW CARD
+                </PixelButton>
+                <PixelButton
+                  type="submit"
+                  className="flex-1 md:flex-none md:w-auto md:min-w-[200px]"
+                  disabled={isSaving}
+                >
+                  {isSaving ? "SAVING..." : "SAVE CHANGES"}
+                </PixelButton>
+              </div>
+            </PixelCard>
+          </div>
+        </form>
+
         {message && (
-          <PixelSection
-            className={`p-3 border ${
-              message.type === "success"
-                ? "bg-green-500/20 border-green-500 text-green-500"
-                : "bg-red-500/20 border-red-500 text-red-500"
-            }`}
-          >
-            <p className="font-pixel text-xs">{message.text}</p>
-          </PixelSection>
+          <PixelToast
+            message={message.text}
+            type={message.type}
+            onClose={() => setMessage(null)}
+          />
         )}
 
-        <PixelTabs tabs={tabs} />
-
-        <div className="pt-4 flex justify-center gap-3 border-t-2 border-gray-100 mt-6">
-          <PixelButton
-            type="button"
-            onClick={() => setShowPreview(true)}
-            variant="secondary"
-            className="w-full md:w-auto md:min-w-[150px]"
-          >
-            PREVIEW CARD
-          </PixelButton>
-          <PixelButton
-            type="submit"
-            className="w-full md:w-auto md:min-w-[200px]"
-            disabled={isSaving}
-          >
-            {isSaving ? "SAVING..." : "SAVE CHANGES"}
-          </PixelButton>
-        </div>
-      </form>
-
-      <PixelModal
-        isOpen={showPreview}
-        onClose={() => setShowPreview(false)}
-        title="Card Preview"
-      >
-        <div className="flex justify-center p-4">
-          <VisitWallCard
-            user={{
-              ...formData,
-              socials: formData.socials.map((s) => ({
-                ...s,
-                url: getSocialLink(s.platform, s.url),
-              })),
-            }}
-            showThemeSwitcher={false}
-          />
-        </div>
-      </PixelModal>
-    </PixelCard>
+        <PixelModal
+          isOpen={showPreview}
+          onClose={() => setShowPreview(false)}
+          title="Card Preview"
+        >
+          <div className="flex justify-center p-4">
+            <VisitWallCard
+              user={{
+                ...formData,
+                socials: formData.socials.map((s) => ({
+                  ...s,
+                  url: getSocialLink(s.platform, s.url),
+                })),
+              }}
+              showThemeSwitcher={false}
+            />
+          </div>
+        </PixelModal>
+      </PixelCard>
+    </div>
   );
 }

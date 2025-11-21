@@ -56,17 +56,8 @@ export default function EditPage() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-4 py-12">
-      <div className="w-full max-w-2xl flex justify-end mb-4">
-        <PixelButton
-          onClick={handleLogout}
-          className="text-xs"
-          variant="secondary"
-        >
-          LOGOUT
-        </PixelButton>
-      </div>
-      {user && <EditForm initialData={user} />}
+    <main className="min-h-screen flex flex-col p-4 py-12">
+      {user && <EditForm initialData={user} onLogout={handleLogout} />}
     </main>
   );
 }

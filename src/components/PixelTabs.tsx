@@ -22,14 +22,14 @@ export default function PixelTabs({
 
   return (
     <div className={className}>
-      <div className="flex flex-wrap gap-2 mb-4 border-b-4 border-[var(--border-color)] pb-2 sticky top-0 bg-[var(--card-bg)] z-10 pt-2">
+      <div className="flex overflow-x-auto whitespace-nowrap gap-2 mb-4 border-b-4 border-[var(--border-color)] pb-2 sticky top-0 bg-[var(--card-bg)] z-10 pt-2 no-scrollbar">
         {tabs.map((tab) => (
           <PixelButton
             key={tab.id}
             type="button"
             onClick={() => setActiveTab(tab.id)}
             variant="secondary"
-            className={`text-[10px] px-3 py-2 transition-all flex-1 sm:flex-none justify-center ${
+            className={`text-[10px] px-3 py-2 transition-all flex-none justify-center ${
               activeTab === tab.id
                 ? "bg-[var(--text-color)]! text-[var(--card-bg)]! translate-y-px shadow-none"
                 : "hover:bg-[var(--button-bg)]"
