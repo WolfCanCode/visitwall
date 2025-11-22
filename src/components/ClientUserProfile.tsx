@@ -22,17 +22,17 @@ export default function ClientUserProfile({ username }: { username: string }) {
         setUser(profile);
 
         // Apply theme
-        if (profile.theme) {
-          document.body.classList.remove(
-            "theme-classic",
-            "theme-gameboy",
-            "theme-dark",
-            "theme-ocean",
-            "theme-pastel"
-          );
-          if (profile.theme !== "classic") {
-            document.body.classList.add(`theme-${profile.theme}`);
-          }
+        document.body.classList.remove(
+          "theme-classic",
+          "theme-gameboy",
+          "theme-dark",
+          "theme-ocean",
+          "theme-pastel"
+        );
+        if (profile.theme && profile.theme !== "classic") {
+          document.body.classList.add(`theme-${profile.theme}`);
+        } else {
+          document.body.classList.add(`theme-classic`);
         }
       } catch (err) {
         setError(true);
@@ -43,7 +43,7 @@ export default function ClientUserProfile({ username }: { username: string }) {
     fetchData();
 
     return () => {
-      // Cleanup theme on unmount
+      // Cleanup theme on unmount and restore user's theme if logged in
       document.body.classList.remove(
         "theme-classic",
         "theme-gameboy",
@@ -51,6 +51,12 @@ export default function ClientUserProfile({ username }: { username: string }) {
         "theme-ocean",
         "theme-pastel"
       );
+
+      // Restore theme from local storage if available
+      const savedTheme = localStorage.getItem("visitwall-theme");
+      if (savedTheme && savedTheme !== "classic") {
+        document.body.classList.add(`theme-${savedTheme}`);
+      }
     };
   }, [username]);
 
