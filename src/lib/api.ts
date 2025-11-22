@@ -233,6 +233,7 @@ async function refreshAccessToken(): Promise<string | null> {
 
     if (!response.ok) {
       clearAuthToken();
+      window.location.href = "/login";
       return null;
     }
 
@@ -244,6 +245,7 @@ async function refreshAccessToken(): Promise<string | null> {
   } catch (error) {
     console.error("Token refresh failed", error);
     clearAuthToken();
+    window.location.href = "/login";
   }
   return null;
 }
@@ -256,7 +258,11 @@ async function fetchWithAuth(url: string, options: RequestOptions = {}) {
   let token = getAuthToken();
 
   if (!token) {
-    throw new Error("No auth token found");
+    // Attempt to refresh if no access token but refresh token exists
+    token = await refreshAccessToken();
+    if (!token) {
+      throw new Error("No auth token found");
+    }
   }
 
   const headers = {
@@ -274,6 +280,8 @@ async function fetchWithAuth(url: string, options: RequestOptions = {}) {
       headers.Authorization = `Bearer ${token}`;
       response = await fetch(url, { ...options, headers });
     } else {
+      clearAuthToken();
+      window.location.href = "/login";
       throw new Error("Session expired. Please login again.");
     }
   }
