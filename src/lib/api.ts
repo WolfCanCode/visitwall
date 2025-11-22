@@ -135,18 +135,15 @@ export async function login(data: LoginRequest): Promise<LoginResponse> {
     throw new Error(error.message || "Login failed");
   }
 
-  return response.json();
+  const json: LoginResponse = await response.json();
+  if (json.data?.accessToken) {
+    setAuthToken(json.data.accessToken, json.data.refreshToken);
+  }
+  return json;
 }
 
 export async function getProfile(): Promise<UserProfile> {
-  const token = getAuthToken();
-  if (!token) throw new Error("No auth token found");
-
-  const response = await fetch(`${API_URL}/user/profile`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await fetchWithAuth(`${API_URL}/user/profile`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch profile");
@@ -161,14 +158,10 @@ export async function getProfile(): Promise<UserProfile> {
 export async function updateProfile(
   data: Partial<UserProfile>
 ): Promise<UserProfile> {
-  const token = getAuthToken();
-  if (!token) throw new Error("No auth token found");
-
-  const response = await fetch(`${API_URL}/user/profile`, {
+  const response = await fetchWithAuth(`${API_URL}/user/profile`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
   });
@@ -206,27 +199,92 @@ export function getAuthToken(): string | null {
   return localStorage.getItem("accessToken");
 }
 
-export function setAuthToken(token: string): void {
+export function setAuthToken(token: string, refreshToken?: string): void {
   if (typeof window === "undefined") return;
   localStorage.setItem("accessToken", token);
+  if (refreshToken) {
+    localStorage.setItem("refreshToken", refreshToken);
+  }
 }
 
 export function clearAuthToken(): void {
   if (typeof window === "undefined") return;
   localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+}
+
+export function getRefreshToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("refreshToken");
+}
+
+async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return null;
+
+  try {
+    const response = await fetch(`${API_URL}/auth/refresh`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    if (!response.ok) {
+      clearAuthToken();
+      return null;
+    }
+
+    const json = await response.json();
+    if (json.data?.accessToken) {
+      setAuthToken(json.data.accessToken);
+      return json.data.accessToken;
+    }
+  } catch (error) {
+    console.error("Token refresh failed", error);
+    clearAuthToken();
+  }
+  return null;
+}
+
+interface RequestOptions extends RequestInit {
+  headers?: Record<string, string>;
+}
+
+async function fetchWithAuth(url: string, options: RequestOptions = {}) {
+  let token = getAuthToken();
+
+  if (!token) {
+    throw new Error("No auth token found");
+  }
+
+  const headers = {
+    ...options.headers,
+    Authorization: `Bearer ${token}`,
+  };
+
+  let response = await fetch(url, { ...options, headers });
+
+  if (response.status === 401) {
+    // Token expired, try to refresh
+    token = await refreshAccessToken();
+    if (token) {
+      // Retry request with new token
+      headers.Authorization = `Bearer ${token}`;
+      response = await fetch(url, { ...options, headers });
+    } else {
+      throw new Error("Session expired. Please login again.");
+    }
+  }
+
+  return response;
 }
 
 // Collection APIs
 
 export async function getCollections(): Promise<Collection[]> {
-  const token = getAuthToken();
-  if (!token) throw new Error("No auth token found");
-
-  const response = await fetch(`${API_URL}/collection`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await fetchWithAuth(`${API_URL}/collection`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch collections");
@@ -240,14 +298,10 @@ export async function createCollection(
   name: string,
   icon?: string
 ): Promise<Collection> {
-  const token = getAuthToken();
-  if (!token) throw new Error("No auth token found");
-
-  const response = await fetch(`${API_URL}/collection`, {
+  const response = await fetchWithAuth(`${API_URL}/collection`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ name, icon }),
   });
@@ -266,14 +320,10 @@ export async function updateCollection(
   name: string,
   icon?: string
 ): Promise<Collection> {
-  const token = getAuthToken();
-  if (!token) throw new Error("No auth token found");
-
-  const response = await fetch(`${API_URL}/collection/${id}`, {
+  const response = await fetchWithAuth(`${API_URL}/collection/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ name, icon }),
   });
@@ -288,14 +338,8 @@ export async function updateCollection(
 }
 
 export async function deleteCollection(id: string): Promise<boolean> {
-  const token = getAuthToken();
-  if (!token) throw new Error("No auth token found");
-
-  const response = await fetch(`${API_URL}/collection/${id}`, {
+  const response = await fetchWithAuth(`${API_URL}/collection/${id}`, {
     method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
   });
 
   if (!response.ok) {
@@ -310,16 +354,12 @@ export async function addProfileToCollection(
   collectionId: string,
   username: string
 ): Promise<Collection> {
-  const token = getAuthToken();
-  if (!token) throw new Error("No auth token found");
-
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_URL}/collection/${collectionId}/profile`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ username }),
     }
