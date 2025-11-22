@@ -144,6 +144,19 @@ export const PixelPin = ({ size = 24, className = "" }: IconProps) => (
   </svg>
 );
 
+export const PixelCheck = ({ size = 24, className = "" }: IconProps) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+  >
+    <path d="M20 7L18 5l-8 8-4-4L4 11l6 6L20 7z" fill="currentColor" />
+  </svg>
+);
+
 export const PixelDice = ({ size = 24, className = "" }: IconProps) => (
   <svg
     width={size}

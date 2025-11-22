@@ -9,7 +9,7 @@ import PixelHeading from "./PixelHeading";
 import PixelSelect from "./PixelSelect";
 import PixelSection from "./PixelSection";
 import AvatarEditor from "./AvatarEditor";
-import { updateProfile } from "@/lib/api";
+import { clearAuthToken, updateProfile } from "@/lib/api";
 import PixelCheckbox from "./PixelCheckbox";
 import { Options } from "@dicebear/pixel-art";
 import PixelModal from "./PixelModal";
@@ -17,6 +17,15 @@ import VisitWallCard from "./VisitWallCard";
 import PixelTabs from "./PixelTabs";
 import { getSocialLink, getSocialDisplayValue } from "@/lib/utils";
 import PixelToast from "./PixelToast";
+import { useRouter } from "next/navigation";
+
+const THEMES = [
+  { id: "classic", label: "Classic", color: "#F3E9C8" },
+  { id: "gameboy", label: "GB", color: "#8B956D" },
+  { id: "dark", label: "Dark", color: "#111111" },
+  { id: "ocean", label: "Ocean", color: "#E0F7FA" },
+  { id: "pastel", label: "Pastel", color: "#FFF5F5" },
+];
 
 const STATUS_OPTIONS = [
   { value: "online", label: "Online" },
@@ -40,10 +49,10 @@ const SOCIAL_PLATFORMS = [
 
 interface EditFormProps {
   initialData: UserProfile;
-  onLogout: () => void;
 }
 
-export default function EditForm({ initialData, onLogout }: EditFormProps) {
+export default function EditForm({ initialData }: EditFormProps) {
+  const router = useRouter();
   const [formData, setFormData] = useState<UserProfile>(() => {
     const data = { ...initialData };
     if (!data.socials || data.socials.length === 0) {
@@ -51,6 +60,9 @@ export default function EditForm({ initialData, onLogout }: EditFormProps) {
     }
     if (!data.goals || data.goals.length === 0) {
       data.goals = [{ id: Date.now().toString(), text: "", completed: false }];
+    }
+    if (!data.theme) {
+      data.theme = "classic";
     }
     return data;
   });
@@ -97,6 +109,10 @@ export default function EditForm({ initialData, onLogout }: EditFormProps) {
     const newSocials = [...formData.socials];
     newSocials[index] = { ...newSocials[index], [field]: value };
     setFormData((prev) => ({ ...prev, socials: newSocials }));
+  };
+
+  const handleThemeChange = (themeId: string) => {
+    setFormData((prev) => ({ ...prev, theme: themeId }));
   };
 
   const handleGoalChange = (
@@ -193,6 +209,11 @@ export default function EditForm({ initialData, onLogout }: EditFormProps) {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const onLogout = () => {
+    clearAuthToken();
+    router.push("/login");
   };
 
   const tabs = [
@@ -296,6 +317,49 @@ export default function EditForm({ initialData, onLogout }: EditFormProps) {
             avatar={formData.avatar as Options}
             onAvatarChange={handleAvatarChange}
           />
+        </div>
+      ),
+    },
+    {
+      id: "theme",
+      label: "THEME",
+      content: (
+        <div>
+          <PixelHeading as="h3" className="mb-3 text-sm">
+            SELECT THEME
+          </PixelHeading>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {THEMES.map((theme) => (
+              <div
+                key={theme.id}
+                onClick={() => handleThemeChange(theme.id)}
+                className={`cursor-pointer border-2 border-black p-2 transition-all hover:-translate-y-1 ${
+                  formData.theme === theme.id
+                    ? "ring-2 ring-black ring-offset-2 bg-gray-100"
+                    : "bg-white"
+                }`}
+              >
+                <div
+                  className="w-full h-24 mb-2 border-2 border-black relative overflow-hidden"
+                  style={{ backgroundColor: theme.color }}
+                >
+                  {/* Mini Preview Representation */}
+                  <div className="absolute top-2 left-2 w-8 h-8 bg-white border-2 border-black rounded-none opacity-50" />
+                  <div className="absolute top-2 left-12 right-2 h-2 bg-black opacity-10" />
+                  <div className="absolute top-6 left-12 right-2 h-2 bg-black opacity-10" />
+                  <div className="absolute bottom-2 left-2 right-2 h-8 bg-white border-2 border-black opacity-30" />
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="font-pixel text-[10px] uppercase">
+                    {theme.label}
+                  </span>
+                  {formData.theme === theme.id && (
+                    <span className="text-green-500 text-xs">✓</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       ),
     },
@@ -425,31 +489,14 @@ export default function EditForm({ initialData, onLogout }: EditFormProps) {
   ];
 
   return (
-    <div className="w-full max-w-2xl mx-auto py-16">
-      <div className="fixed top-0 left-0 w-full z-40">
-        <PixelCard className="rounded-none border-x-0 border-t-0 flex shadow-md py-4 px-4 bg-[var(--card-bg)]">
-          <div className="max-w-7xl flex justify-between items-center w-full mx-auto">
-            <PixelHeading as="h2" className="mb-0 text-sm md:text-base">
-              EDIT PROFILE
-            </PixelHeading>
-            <PixelButton
-              onClick={onLogout}
-              className="text-[10px] px-3 py-2"
-              variant="secondary"
-            >
-              LOGOUT
-            </PixelButton>
-          </div>
-        </PixelCard>
-      </div>
-
+    <div className="w-full mx-auto p-4 pb-24 space-y-6">
       <PixelCard className="w-full">
         <form onSubmit={handleSubmit} className="space-y-6">
           <PixelTabs tabs={tabs} />
 
-          <div className="fixed bottom-0 left-0 w-full z-40">
+          <div className="block md:hidden fixed bottom-0 m-0 right-0 left-0 md:left-auto md:w-[calc(100%-17rem)] z-40">
             <PixelCard className="rounded-none border-x-0 border-b-0 flex shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] pb-8 pt-4 px-4 bg-[var(--section-bg)]">
-              <div className="max-w-7xl flex justify-between w-full mx-auto gap-3">
+              <div className="flex justify-between w-full mx-auto gap-3">
                 <PixelButton
                   type="button"
                   onClick={() => setShowPreview(true)}
@@ -468,6 +515,24 @@ export default function EditForm({ initialData, onLogout }: EditFormProps) {
               </div>
             </PixelCard>
           </div>
+
+          <div className="hidden md:flex justify-between w-full mx-auto gap-3">
+            <PixelButton
+              type="button"
+              onClick={() => setShowPreview(true)}
+              variant="secondary"
+              className="flex-1 md:flex-none md:w-auto md:min-w-[150px]"
+            >
+              PREVIEW CARD
+            </PixelButton>
+            <PixelButton
+              type="submit"
+              className="flex-1 md:flex-none md:w-auto md:min-w-[200px]"
+              disabled={isSaving}
+            >
+              {isSaving ? "SAVING..." : "SAVE CHANGES"}
+            </PixelButton>
+          </div>
         </form>
 
         {message && (
@@ -483,7 +548,11 @@ export default function EditForm({ initialData, onLogout }: EditFormProps) {
           onClose={() => setShowPreview(false)}
           title="Card Preview"
         >
-          <div className="flex justify-center p-4">
+          <div
+            className={`flex justify-center p-4 theme-${
+              formData.theme || "classic"
+            }`}
+          >
             <VisitWallCard
               user={{
                 ...formData,

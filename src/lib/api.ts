@@ -1,5 +1,5 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-import { UserProfile } from "./types";
+import { UserProfile, Collection } from "./types";
 
 export interface RegisterRequest {
   email: string;
@@ -48,6 +48,22 @@ export interface ProfileResponse {
   success?: boolean;
   data?: {
     profile: UserProfile;
+  };
+  message?: string;
+}
+
+export interface CollectionListResponse {
+  success?: boolean;
+  data?: {
+    collections: Collection[];
+  };
+  message?: string;
+}
+
+export interface CollectionResponse {
+  success?: boolean;
+  data?: {
+    collection: Collection;
   };
   message?: string;
 }
@@ -198,4 +214,127 @@ export function setAuthToken(token: string): void {
 export function clearAuthToken(): void {
   if (typeof window === "undefined") return;
   localStorage.removeItem("accessToken");
+}
+
+// Collection APIs
+
+export async function getCollections(): Promise<Collection[]> {
+  const token = getAuthToken();
+  if (!token) throw new Error("No auth token found");
+
+  const response = await fetch(`${API_URL}/collection`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch collections");
+  }
+
+  const json: CollectionListResponse = await response.json();
+  return json.data?.collections || [];
+}
+
+export async function createCollection(
+  name: string,
+  icon?: string
+): Promise<Collection> {
+  const token = getAuthToken();
+  if (!token) throw new Error("No auth token found");
+
+  const response = await fetch(`${API_URL}/collection`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ name, icon }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create collection");
+  }
+
+  const json: CollectionResponse = await response.json();
+  if (!json.data?.collection) throw new Error("No collection data returned");
+  return json.data.collection;
+}
+
+export async function updateCollection(
+  id: string,
+  name: string,
+  icon?: string
+): Promise<Collection> {
+  const token = getAuthToken();
+  if (!token) throw new Error("No auth token found");
+
+  const response = await fetch(`${API_URL}/collection/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ name, icon }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update collection");
+  }
+
+  const json: CollectionResponse = await response.json();
+  if (!json.data?.collection) throw new Error("No collection data returned");
+  return json.data.collection;
+}
+
+export async function deleteCollection(id: string): Promise<boolean> {
+  const token = getAuthToken();
+  if (!token) throw new Error("No auth token found");
+
+  const response = await fetch(`${API_URL}/collection/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete collection");
+  }
+
+  const json = await response.json();
+  return json.success === true;
+}
+
+export async function addProfileToCollection(
+  collectionId: string,
+  username: string
+): Promise<Collection> {
+  const token = getAuthToken();
+  if (!token) throw new Error("No auth token found");
+
+  const response = await fetch(
+    `${API_URL}/collection/${collectionId}/profile`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ username }),
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ error: "Failed to add profile" }));
+    throw new Error(
+      error.message || error.error || "Failed to add profile to collection"
+    );
+  }
+
+  const json: CollectionResponse = await response.json();
+  if (!json.data?.collection) throw new Error("No collection data returned");
+  return json.data.collection;
 }

@@ -36,7 +36,19 @@ export interface UserProfile {
   socials: SocialLink[];
   goals: Goal[];
   latestUpdate: Update;
+  theme?: string;
   PK?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface Collection {
+  id: string;
+  name: string;
+  icon?: string;
+  profileIds: string[];
+  userId: string;
+  createdAt?: string;
+  updatedAt?: string;
+  profiles?: UserProfile[]; // Populated in some responses
 }

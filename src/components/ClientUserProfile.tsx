@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import VisitWallCard from "@/components/VisitWallCard";
-import { getPublicProfile } from "@/lib/api";
+import { getPublicProfile, getAuthToken } from "@/lib/api";
 import { UserProfile } from "@/lib/types";
 import Link from "next/link";
 import PixelButton from "@/components/PixelButton";
@@ -12,12 +12,28 @@ export default function ClientUserProfile({ username }: { username: string }) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
+    setIsLoggedIn(!!getAuthToken());
     const fetchData = async () => {
       try {
         const profile = await getPublicProfile(username);
         setUser(profile);
+
+        // Apply theme
+        if (profile.theme) {
+          document.body.classList.remove(
+            "theme-classic",
+            "theme-gameboy",
+            "theme-dark",
+            "theme-ocean",
+            "theme-pastel"
+          );
+          if (profile.theme !== "classic") {
+            document.body.classList.add(`theme-${profile.theme}`);
+          }
+        }
       } catch (err) {
         setError(true);
       } finally {
@@ -25,6 +41,17 @@ export default function ClientUserProfile({ username }: { username: string }) {
       }
     };
     fetchData();
+
+    return () => {
+      // Cleanup theme on unmount
+      document.body.classList.remove(
+        "theme-classic",
+        "theme-gameboy",
+        "theme-dark",
+        "theme-ocean",
+        "theme-pastel"
+      );
+    };
   }, [username]);
 
   if (loading) {
@@ -54,8 +81,21 @@ export default function ClientUserProfile({ username }: { username: string }) {
   }
 
   return (
-    <main className="min-h-screen p-4 md:p-8 flex items-center justify-center">
-      <VisitWallCard user={user} showThemeSwitcher={false} />
+    <main className="min-h-screen p-4 md:p-8 flex items-center justify-center relative">
+      {isLoggedIn && (
+        <div className="fixed top-4 left-4 z-50">
+          <Link href="/contacts">
+            <PixelButton className="text-xs" variant="secondary">
+              ← BACK TO PORTAL
+            </PixelButton>
+          </Link>
+        </div>
+      )}
+      <VisitWallCard
+        user={user}
+        showThemeSwitcher={false}
+        enableCollections={isLoggedIn}
+      />
     </main>
   );
 }
