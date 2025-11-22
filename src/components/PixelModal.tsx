@@ -33,8 +33,8 @@ export default function PixelModal({
       <div className="absolute inset-0" onClick={onClose} />
       <div className="relative w-full max-w-md z-10">
         <PixelCard className="w-full max-h-[90vh] overflow-y-auto no-scrollbar">
-          <div className="flex justify-between items-center mb-4 sticky top-0 bg-white z-20 pb-2 border-b-2 border-gray-100">
-            <h2 className="font-pixel text-sm uppercase">
+          <div className="flex justify-between items-center mb-4 sticky top-0 bg-[var(--card-bg)] z-20 pb-2 border-b-2 border-[var(--border-color)]">
+            <h2 className="font-pixel text-sm uppercase text-[var(--text-color)]">
               {title || "Preview"}
             </h2>
             <PixelButton

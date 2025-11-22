@@ -115,7 +115,7 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
               ))}
             </nav>
 
-            <div className="mt-auto border-t-2 border-gray-100 pt-4">
+            <div className="mt-auto border-t-2 border-[var(--border-color)] pt-4">
               <PixelButton
                 onClick={handleLogout}
                 variant="secondary"
