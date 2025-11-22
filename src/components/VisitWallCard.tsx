@@ -122,10 +122,10 @@ export default function VisitWallCard({
   }[user.status];
 
   return (
-    <div className="relative w-full max-w-md mx-auto">
+    <div className="relative w-full max-w-md mx-auto text-[var(--text-color)] font-body antialiased transition-colors duration-300">
       {showThemeSwitcher && <ThemeSwitcher />}
 
-      <PixelCard className="w-full relative">
+      <PixelCard className="w-full relative bg-[var(--card-bg)] border-[4px] border-[var(--border-color)] p-6 shadow-[4px_4px_0_var(--border-color)]">
         {/* Saved Badge */}
         {enableCollections && isInCollection && (
           <div className="absolute top-4 right-4 z-10 bg-[#E0F2FE] border-2 border-black px-2 py-1 shadow-[2px_2px_0_0_rgba(0,0,0,1)] flex items-center gap-1 rotate-[-5deg] animate-in fade-in zoom-in duration-300">

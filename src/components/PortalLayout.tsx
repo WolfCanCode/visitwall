@@ -1,11 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import PixelCard from "./PixelCard";
 import PixelButton from "./PixelButton";
-import { clearAuthToken } from "@/lib/api";
+import { clearAuthToken, getProfile } from "@/lib/api";
 
 interface PortalLayoutProps {
   children: React.ReactNode;
@@ -14,6 +14,47 @@ interface PortalLayoutProps {
 export default function PortalLayout({ children }: PortalLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
+
+  useEffect(() => {
+    // Apply theme from local storage immediately if available to reduce flash
+    const savedTheme = localStorage.getItem("visitwall-theme");
+    if (savedTheme) {
+      document.body.classList.remove(
+        "theme-classic",
+        "theme-gameboy",
+        "theme-dark",
+        "theme-ocean",
+        "theme-pastel"
+      );
+      if (savedTheme !== "classic") {
+        document.body.classList.add(`theme-${savedTheme}`);
+      }
+    }
+
+    const applyTheme = async () => {
+      try {
+        const profile = await getProfile();
+        if (profile.theme) {
+          // Update local storage to keep it in sync
+          localStorage.setItem("visitwall-theme", profile.theme);
+
+          document.body.classList.remove(
+            "theme-classic",
+            "theme-gameboy",
+            "theme-dark",
+            "theme-ocean",
+            "theme-pastel"
+          );
+          if (profile.theme !== "classic") {
+            document.body.classList.add(`theme-${profile.theme}`);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile for theme application", error);
+      }
+    };
+    applyTheme();
+  }, []);
 
   const handleLogout = () => {
     clearAuthToken();

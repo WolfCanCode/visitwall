@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { UserProfile, SocialLink, Goal } from "@/lib/types";
 import PixelInput from "./PixelInput";
 import PixelButton from "./PixelButton";
@@ -72,6 +72,30 @@ export default function EditForm({ initialData }: EditFormProps) {
     type: "success" | "error";
     text: string;
   } | null>(null);
+
+  useEffect(() => {
+    const theme = formData.theme || "classic";
+    document.body.classList.remove(
+      "theme-classic",
+      "theme-gameboy",
+      "theme-dark",
+      "theme-ocean",
+      "theme-pastel"
+    );
+    if (theme !== "classic") {
+      document.body.classList.add(`theme-${theme}`);
+    }
+
+    return () => {
+      document.body.classList.remove(
+        "theme-classic",
+        "theme-gameboy",
+        "theme-dark",
+        "theme-ocean",
+        "theme-pastel"
+      );
+    };
+  }, [formData.theme]);
 
   const handleAvatarChange = useCallback(
     (avatar: Options) => {
@@ -552,6 +576,13 @@ export default function EditForm({ initialData }: EditFormProps) {
             className={`flex justify-center p-4 theme-${
               formData.theme || "classic"
             }`}
+            style={{
+              backgroundColor: "var(--bg-color)",
+              backgroundImage:
+                "radial-gradient(var(--dot-color) 15%, transparent 16%), radial-gradient(var(--dot-color) 15%, transparent 16%)",
+              backgroundSize: "20px 20px",
+              backgroundPosition: "0 0, 10px 10px",
+            }}
           >
             <VisitWallCard
               user={{
