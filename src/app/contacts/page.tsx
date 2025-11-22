@@ -27,6 +27,7 @@ export default function ContactsPage() {
   );
   const [editName, setEditName] = useState("");
   const [editIcon, setEditIcon] = useState("");
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null); // "new" or collectionId
 
   const EMOJI_OPTIONS = [
     "📁",
@@ -93,17 +94,17 @@ export default function ContactsPage() {
 
   return (
     <PortalLayout>
-      <div className="p-4 pb-24 space-y-6">
+      <div className="md:p-4 pb-24 space-y-6">
         <PixelCard>
           <div className="flex justify-between items-center mb-4">
             <PixelHeading as="h2" className="mb-0 text-sm md:text-lg">
-              CONTACT LIST
+              Contact Vault
             </PixelHeading>
             <PixelButton
               onClick={() => setIsCreating(true)}
               className="text-xs"
             >
-              + NEW COLLECTION
+              + NEW
             </PixelButton>
           </div>
 
@@ -112,24 +113,41 @@ export default function ContactsPage() {
               <div className="flex flex-col gap-2 items-start">
                 <div className="flex flex-col gap-1">
                   <span className="font-pixel text-[10px] uppercase">Icon</span>
-                  <div className="relative group">
-                    <div className="w-[38px] h-[38px] border-2 border-black bg-white flex items-center justify-center text-xl cursor-pointer hover:bg-gray-50">
+                  <div className="relative">
+                    <div
+                      onClick={() =>
+                        setOpenDropdownId(
+                          openDropdownId === "new" ? null : "new"
+                        )
+                      }
+                      className="w-[38px] h-[38px] border-2 border-black bg-white flex items-center justify-center text-xl cursor-pointer hover:bg-gray-50 active:bg-gray-100"
+                    >
                       {newCollectionIcon}
                     </div>
-                    <div className="absolute top-full left-0 mt-1 bg-white border-2 border-black p-2 grid grid-cols-5 gap-1 w-[180px] z-10 invisible group-hover:visible">
-                      <div className="absolute inset-0 bg-transparent -top-2 h-[calc(100%+8px)] -z-10" />
-                      {EMOJI_OPTIONS.map((emoji) => (
-                        <button
-                          key={emoji}
-                          onClick={() => setNewCollectionIcon(emoji)}
-                          className={`w-8 h-8 flex items-center justify-center hover:bg-gray-100 ${
-                            newCollectionIcon === emoji ? "bg-gray-200" : ""
-                          }`}
-                        >
-                          {emoji}
-                        </button>
-                      ))}
-                    </div>
+                    {openDropdownId === "new" && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-0"
+                          onClick={() => setOpenDropdownId(null)}
+                        />
+                        <div className="absolute top-full left-0 mt-1 bg-white border-2 border-black p-2 grid grid-cols-5 gap-1 w-[180px] z-10">
+                          {EMOJI_OPTIONS.map((emoji) => (
+                            <button
+                              key={emoji}
+                              onClick={() => {
+                                setNewCollectionIcon(emoji);
+                                setOpenDropdownId(null);
+                              }}
+                              className={`w-8 h-8 flex items-center justify-center hover:bg-gray-100 ${
+                                newCollectionIcon === emoji ? "bg-gray-200" : ""
+                              }`}
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
                 <div className="flex-1">
@@ -171,30 +189,49 @@ export default function ContactsPage() {
               >
                 <div className="flex justify-between items-center mb-3">
                   {editingCollectionId === collection.id ? (
-                    <div className="flex gap-2 items-center flex-1 mr-4">
-                      <div className="relative group">
-                        <div className="w-8 h-8 border-b-2 border-black flex items-center justify-center text-lg cursor-pointer">
+                    <div className="flex gap-2 items-center flex-1">
+                      <div className="relative">
+                        <div
+                          onClick={() =>
+                            setOpenDropdownId(
+                              openDropdownId === collection.id
+                                ? null
+                                : collection.id
+                            )
+                          }
+                          className="w-8 h-8 border-b-2 border-black flex items-center justify-center text-lg cursor-pointer active:bg-gray-100"
+                        >
                           {editIcon}
                         </div>
-                        <div className="absolute top-full left-0 mt-1 bg-white border-2 border-black p-2 grid grid-cols-5 gap-1 w-[180px] z-10 invisible group-hover:visible">
-                          <div className="absolute inset-0 bg-transparent -top-2 h-[calc(100%+8px)] -z-10" />
-                          {EMOJI_OPTIONS.map((emoji) => (
-                            <button
-                              key={emoji}
-                              onClick={() => setEditIcon(emoji)}
-                              className={`w-8 h-8 flex items-center justify-center hover:bg-gray-100 ${
-                                editIcon === emoji ? "bg-gray-200" : ""
-                              }`}
-                            >
-                              {emoji}
-                            </button>
-                          ))}
-                        </div>
+                        {openDropdownId === collection.id && (
+                          <>
+                            <div
+                              className="fixed inset-0 z-0"
+                              onClick={() => setOpenDropdownId(null)}
+                            />
+                            <div className="absolute top-full left-0 mt-1 bg-white border-2 border-black p-2 grid grid-cols-5 gap-1 w-[180px] z-10">
+                              {EMOJI_OPTIONS.map((emoji) => (
+                                <button
+                                  key={emoji}
+                                  onClick={() => {
+                                    setEditIcon(emoji);
+                                    setOpenDropdownId(null);
+                                  }}
+                                  className={`w-8 h-8 flex items-center justify-center hover:bg-gray-100 ${
+                                    editIcon === emoji ? "bg-gray-200" : ""
+                                  }`}
+                                >
+                                  {emoji}
+                                </button>
+                              ))}
+                            </div>
+                          </>
+                        )}
                       </div>
                       <input
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
-                        className="font-pixel text-xs p-1 border-b-2 border-black bg-transparent outline-none w-full"
+                        className="font-pixel text-sm h-8 p-1 border-b-2 border-black bg-transparent outline-none w-full"
                         autoFocus
                       />
                       <PixelButton
@@ -222,29 +259,29 @@ export default function ContactsPage() {
                       </span>
                     </div>
                   )}
-
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() =>
-                        startEdit(
-                          collection.id,
-                          collection.name,
-                          collection.icon
-                        )
-                      }
-                      className="text-[10px] font-pixel hover:text-blue-500"
-                    >
-                      EDIT
-                    </button>
-                    <button
-                      onClick={() => handleDelete(collection.id)}
-                      className="text-[10px] font-pixel hover:text-red-500"
-                    >
-                      DELETE
-                    </button>
-                  </div>
+                  {editingCollectionId === null && (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() =>
+                          startEdit(
+                            collection.id,
+                            collection.name,
+                            collection.icon
+                          )
+                        }
+                        className="text-[10px] font-pixel hover:text-blue-500"
+                      >
+                        EDIT
+                      </button>
+                      <button
+                        onClick={() => handleDelete(collection.id)}
+                        className="text-[10px] font-pixel hover:text-red-500"
+                      >
+                        DELETE
+                      </button>
+                    </div>
+                  )}
                 </div>
-
                 {/* Profiles Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {collection.profiles?.map((profile) => (

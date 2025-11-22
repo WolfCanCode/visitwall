@@ -489,7 +489,7 @@ export default function EditForm({ initialData }: EditFormProps) {
   ];
 
   return (
-    <div className="w-full mx-auto p-4 pb-24 space-y-6">
+    <div className="w-full mx-auto md:p-4 pb-24 space-y-6">
       <PixelCard className="w-full">
         <form onSubmit={handleSubmit} className="space-y-6">
           <PixelTabs tabs={tabs} />
